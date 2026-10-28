@@ -451,16 +451,16 @@ export default function Portfolio() {
           padding: 0 14px;
           border: 1px solid var(--line);
           border-radius: 10px;
-          background: var(--surface);
+          background-color: #111111;
           color: var(--ink);
           text-decoration: none;
           font-size: 13px;
           cursor: pointer;
-          transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+          transition: background-color 280ms ease, color 280ms ease, transform 280ms ease;
         }
 
         .portfolio-root .shortcut:hover {
-          background: var(--ink);
+          background-color: var(--ink);
           color: var(--paper);
           transform: translateY(-2px);
         }
@@ -668,8 +668,19 @@ export default function Portfolio() {
           padding: 36px clamp(28px, 5vw, 80px) 64px;
         }
 
-        .portfolio-root .details-copy {
+        .portfolio-root .details-stack {
+          display: grid;
           min-width: 0;
+        }
+
+        .portfolio-root .details-copy {
+          grid-area: 1 / 1;
+          min-width: 0;
+          visibility: hidden;
+        }
+
+        .portfolio-root .details-copy[data-active="true"] {
+          visibility: visible;
           animation: portfolio-details-in 350ms cubic-bezier(.22, 1, .36, 1) both;
         }
 
@@ -705,24 +716,32 @@ export default function Portfolio() {
 
         /* Media */
 
-        .portfolio-root .media-frame {
+        .portfolio-root .media-slot {
           position: relative;
           align-self: start;
           width: 100%;
           min-width: 0;
-          overflow: hidden;
-          border: 1px solid var(--line);
-          border-radius: 16px;
-          background: var(--surface-secondary);
+          aspect-ratio: 16 / 10;
+        }
+
+        .portfolio-root .media-frame {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           animation: portfolio-details-in 400ms cubic-bezier(.22, 1, .36, 1) 60ms both;
         }
 
         .portfolio-root .media-frame img,
         .portfolio-root .media-frame video {
           display: block;
-          width: 100%;
+          width: auto;
           height: auto;
-          border: 0;
+          max-width: 100%;
+          max-height: 100%;
+          border: 1px solid var(--line);
+          border-radius: 16px;
           object-fit: contain;
         }
 
@@ -734,7 +753,9 @@ export default function Portfolio() {
           gap: 12px;
           width: 100%;
           height: 100%;
-          min-height: 220px;
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          background: var(--surface-secondary);
           padding: 24px;
           color: var(--muted);
           text-align: center;
@@ -972,6 +993,15 @@ export default function Portfolio() {
             transition-duration: .01ms !important;
             scroll-behavior: auto !important;
           }
+
+          .portfolio-root .shortcut {
+            transition-property: background-color, color;
+            transition-duration: 280ms !important;
+          }
+
+          .portfolio-root .shortcut:hover {
+            transform: none;
+          }
         }
       `}</style>
 
@@ -1120,43 +1150,51 @@ export default function Portfolio() {
       </section>
 
       <section className="project-details" aria-live="polite">
-        <div
-          className="details-copy"
-          key={activeProject.id + "-details"}
-        >
-          <h2 className="project-role">{activeProject.role}</h2>
-          <p className="project-description">
-            {activeProject.description}
-          </p>
-          <div className="project-index">
-            <strong>
-              {String(activeIndex + 1).padStart(2, "0")}
-            </strong>
-            {" / "}
-            {String(projects.length).padStart(2, "0")}
-          </div>
+        <div className="details-stack">
+          {projects.map((project, index) => (
+            <div
+              className="details-copy"
+              key={project.id}
+              data-active={index === activeIndex}
+              aria-hidden={index !== activeIndex}
+            >
+              <h2 className="project-role">{project.role}</h2>
+              <p className="project-description">
+                {project.description}
+              </p>
+              <div className="project-index">
+                <strong>
+                  {String(index + 1).padStart(2, "0")}
+                </strong>
+                {" / "}
+                {String(projects.length).padStart(2, "0")}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div
-          className="media-frame"
-          key={activeProject.id + "-media"}
-        >
-          {activeProject.videoUrl ? (
-            <video
-              src={activeProject.videoUrl}
-              controls
-              playsInline
-              preload="metadata"
-              aria-label={activeProject.title + " video"}
-            />
-          ) : activeProject.mediaImage ? (
-            <img
-              src={activeProject.mediaImage}
-              alt={activeProject.title + " project preview"}
-            />
-          ) : (
-            <MediaPlaceholder title={activeProject.title} />
-          )}
+        <div className="media-slot">
+          <div
+            className="media-frame"
+            key={activeProject.id + "-media"}
+          >
+            {activeProject.videoUrl ? (
+              <video
+                src={activeProject.videoUrl}
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={activeProject.title + " video"}
+              />
+            ) : activeProject.mediaImage ? (
+              <img
+                src={activeProject.mediaImage}
+                alt={activeProject.title + " project preview"}
+              />
+            ) : (
+              <MediaPlaceholder title={activeProject.title} />
+            )}
+          </div>
         </div>
       </section>
     </main>
