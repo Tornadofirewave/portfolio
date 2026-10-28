@@ -377,6 +377,7 @@ export default function Portfolio() {
 
         .portfolio-root .hero-name {
           margin: 0;
+          color: var(--ink);
           font-family: "Trajan Pro", Georgia, serif;
           font-size: clamp(32px, 3.5vw, 46px);
           line-height: 1.15;
@@ -449,7 +450,7 @@ export default function Portfolio() {
           min-height: 42px;
           padding: 0 14px;
           border: 1px solid var(--line);
-          border-radius: 0;
+          border-radius: 10px;
           background: var(--surface);
           color: var(--ink);
           text-decoration: none;
@@ -515,7 +516,7 @@ export default function Portfolio() {
           padding: 0;
           overflow: hidden;
           border: 1px solid var(--line);
-          border-radius: 0;
+          border-radius: 16px;
           background: var(--surface-secondary);
           color: var(--ink);
           cursor: pointer;
@@ -706,24 +707,21 @@ export default function Portfolio() {
 
         .portfolio-root .media-frame {
           position: relative;
+          align-self: start;
           width: 100%;
           min-width: 0;
-          min-height: 220px;
           overflow: hidden;
-          aspect-ratio: 16 / 10;
           border: 1px solid var(--line);
+          border-radius: 16px;
           background: var(--surface-secondary);
           animation: portfolio-details-in 400ms cubic-bezier(.22, 1, .36, 1) 60ms both;
         }
 
         .portfolio-root .media-frame img,
-        .portfolio-root .media-frame video,
-        .portfolio-root .media-frame iframe {
-          position: absolute;
-          inset: 0;
+        .portfolio-root .media-frame video {
           display: block;
           width: 100%;
-          height: 100%;
+          height: auto;
           border: 0;
           object-fit: contain;
         }
@@ -960,9 +958,8 @@ export default function Portfolio() {
             line-height: 1.75;
           }
 
-          .portfolio-root .media-frame {
+          .portfolio-root .media-placeholder {
             min-height: 180px;
-            aspect-ratio: 16 / 10;
           }
         }
 
