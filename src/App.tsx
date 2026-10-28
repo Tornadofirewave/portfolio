@@ -60,6 +60,12 @@ const shortcuts = [
     action: "link",
   },
   {
+    label: "Itch",
+    icon: "itch",
+    url: "https://tornadofirewave.itch.io",
+    action: "link",
+  },
+  {
     label: "Email",
     icon: "mail",
     url: "lawrenceminle@gmail.com",
@@ -86,6 +92,23 @@ function ShortcutIcon({ type }: { type: string }) {
           strokeLinejoin="round"
           transform="translate(2 0) scale(.85)"
         />
+      </svg>
+    );
+  }
+
+  if (type === "itch") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m3 8 2-5h14l2 5v3a2.25 2.25 0 0 1-4.5 0 2.25 2.25 0 0 1-4.5 0 2.25 2.25 0 0 1-4.5 0A2.25 2.25 0 0 1 3 11V8ZM5 14v7h14v-7M3 8h18" />
+        <path d="M9 21v-5h6v5" />
       </svg>
     );
   }
@@ -218,17 +241,15 @@ function MediaPlaceholder({ title }: { title: string }) {
 }
 
 export default function Portfolio() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [activePosition, setActivePosition] = useState(0);
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [notice, setNotice] = useState("");
 
+  const activeIndex = ((activePosition % projects.length) + projects.length) % projects.length;
   const activeProject = projects[activeIndex];
 
   function moveCarousel(step: number) {
-    setActiveIndex(
-      (current) =>
-        (current + step + projects.length) % projects.length,
-    );
+    setActivePosition((current) => current + step);
   }
 
   useEffect(() => {
@@ -243,8 +264,10 @@ export default function Portfolio() {
         return;
       }
 
-      if (event.key === "ArrowLeft") moveCarousel(-1);
-      if (event.key === "ArrowRight") moveCarousel(1);
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        moveCarousel(event.key === "ArrowLeft" ? -1 : 1);
+      }
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -273,16 +296,8 @@ export default function Portfolio() {
     ];
   }
 
-  // Show three unique cards with three projects.
-  // Automatically expand to five unique cards as the project list grows.
-  const radius = Math.min(
-    2,
-    Math.floor((projects.length - 1) / 2),
-  );
-  const offsets = Array.from(
-    { length: radius * 2 + 1 },
-    (_, index) => index - radius,
-  );
+  // Hidden edge slots let cards enter and leave without crossing the row.
+  const offsets = [-2, -1, 0, 1, 2];
 
   return (
     <main className="portfolio-root" data-theme={theme}>
@@ -335,11 +350,28 @@ export default function Portfolio() {
         /* Hero */
 
         .portfolio-root .hero {
+          --ink: #f5f5f5;
+          --paper: #111111;
+          --body-text: #eeeeee;
+          --muted: #cccccc;
+          --line: rgba(255, 255, 255, .45);
+          --surface: rgba(12, 12, 20, .8);
           position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
+          width: 100%;
+          min-height: 360px;
           padding: 54px 32px 46px;
+          border-bottom: 1px solid var(--line);
+          background-color: #100b22;
+          background-image:
+            linear-gradient(rgba(5, 5, 14, .2), rgba(5, 5, 14, .55)),
+            url("${import.meta.env.BASE_URL}background.png");
+          background-position: center;
+          background-size: cover;
+          background-repeat: no-repeat;
           text-align: center;
         }
 
@@ -467,6 +499,7 @@ export default function Portfolio() {
           height: clamp(220px, 25vw, 320px);
           margin-inline: auto;
           isolation: isolate;
+          overflow: hidden;
         }
 
         .portfolio-root .project-card {
@@ -521,7 +554,8 @@ export default function Portfolio() {
 
         .portfolio-root .project-card[data-position="far-left"] {
           z-index: 1;
-          opacity: .25;
+          opacity: 0;
+          pointer-events: none;
           filter: brightness(.8);
           transform: translate3d(-245%, -50%, 0) scale(.68);
           box-shadow: none;
@@ -529,7 +563,8 @@ export default function Portfolio() {
 
         .portfolio-root .project-card[data-position="far-right"] {
           z-index: 1;
-          opacity: .25;
+          opacity: 0;
+          pointer-events: none;
           filter: brightness(.8);
           transform: translate3d(145%, -50%, 0) scale(.68);
           box-shadow: none;
@@ -815,6 +850,7 @@ export default function Portfolio() {
 
         @media (max-width: 600px) {
           .portfolio-root .hero {
+            min-height: 340px;
             padding: 64px 20px 30px;
           }
 
@@ -939,7 +975,7 @@ export default function Portfolio() {
         }
       `}</style>
 
-      <section className="hero">
+      <header className="hero">
         <button
           type="button"
           className="theme-toggle"
@@ -1002,7 +1038,7 @@ export default function Portfolio() {
         >
           {notice}
         </div>
-      </section>
+      </header>
 
       <section
         className="projects-section"
@@ -1034,10 +1070,12 @@ export default function Portfolio() {
 
               return (
                 <button
-                  key={project.id}
+                  key={activePosition + offset}
                   type="button"
                   className="project-card"
                   data-position={position}
+                  aria-hidden={Math.abs(offset) > 1 ? true : undefined}
+                  tabIndex={Math.abs(offset) > 1 ? -1 : 0}
                   aria-label={`Select ${project.title}`}
                   aria-current={
                     offset === 0 ? "true" : undefined
