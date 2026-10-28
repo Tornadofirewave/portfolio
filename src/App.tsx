@@ -377,14 +377,17 @@ export default function Portfolio() {
 
         .portfolio-root .hero-name {
           margin: 0;
+          font-family: "Trajan Pro", Georgia, serif;
           font-size: clamp(32px, 3.5vw, 46px);
           line-height: 1.15;
-          font-weight: 500;
+          font-weight: 700;
           letter-spacing: -1.6px;
           animation: portfolio-rise 650ms cubic-bezier(.22, 1, .36, 1) both;
         }
 
         .portfolio-root .hero-blurb {
+          font-family: "Trajan Pro", Georgia, serif;
+          font-weight: 400;
           max-width: 620px;
           margin: 12px 0 0;
           color: var(--body-text);
